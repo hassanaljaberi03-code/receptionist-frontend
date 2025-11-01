@@ -25,35 +25,62 @@
   <p id="status"></p>
 
   <script>
-    const API_URL = "https://ai-receptionist-q5nl.onrender.com/ai/lead";
- // din backend
-    const f = document.getElementById("form"), s = document.getElementById("status");
-    f.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      s.textContent = "Sender...";
-      const payload = {
-        name: document.getElementById("name").value,
-        phone: document.getElementById("phone").value,
-        message: document.getElementById("message").value
-      };
-      try {
-        const r = await fetch(API_URL, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload)
-        });
-        const data = await r.json();
-        if (data.ok) {
-          s.textContent = "✅ Tak! Din besked er gemt.";
-          s.className = "ok"; f.reset();
-        } else {
-          throw new Error(data.error || "Fejl");
-        }
-      } catch (err) {
-        s.textContent = "❌ Kunne ikke sende: " + err.message;
-        s.className = "err";
+console.log("INIT: script loaded");
+
+document.addEventListener("DOMContentLoaded", () => {
+  console.log("DOM READY");
+
+  const API_URL = "https://ai-receptionist-q5nl.onrender.com/ai/lead";
+
+  const f = document.getElementById("form");
+  const s = document.getElementById("status");
+
+  if (!f || !s) {
+    console.error("Kunne ikke finde form eller status element");
+    return;
+  }
+
+  f.addEventListener("submit", async (e) => {
+    console.log("FORM SUBMITTED");
+    e.preventDefault();
+
+    s.textContent = "Sender...";
+
+    const payload = {
+      name: document.getElementById("name").value,
+      phone: document.getElementById("phone").value,
+      message: document.getElementById("message").value,
+    };
+
+    console.log("PAYLOAD", payload);
+
+    try {
+      const r = await fetch(API_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      console.log("RESPONSE STATUS", r.status);
+
+      const data = await r.json();
+      console.log("RESPONSE BODY", data);
+
+      if (data.ok) {
+        s.textContent = "✅ Tak! Din besked er gemt.";
+        s.className = "ok";
+        f.reset();
+      } else {
+        throw new Error(data.error || "Fejl");
       }
-    });
-  </script>
+
+    } catch (err) {
+      console.error("FRONTEND ERROR", err);
+      s.textContent = "❌ Kunne ikke sende: " + err.message;
+      s.className = "err";
+    }
+  });
+});
+</script>
 </body>
 </html>
